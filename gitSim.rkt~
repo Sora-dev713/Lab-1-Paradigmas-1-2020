@@ -71,22 +71,6 @@
 (define (workspace? W)
   (and(list? W)(not(null? W))(eq? "Workspace" (car W))(listArch? (cadr W))(null? (cddr W))))
 
-;Funciones selectoras
-;Funcion GetNameW
-;Dominio: Workspace
-;Recorrido String
-(define (getNameW W)
-  (if (workspace? W)
-      (car W)
-      '()))
-
-;Funcion GetListArcW
-;dominio: Workspace
-;Recorrido: Lista Archivos
-(define (getListaArcW W)
-  (if (workspace? W)
-      (cadr W)
-      '()))
 
 ;----------------------------------------------------------------------------
 ;TDA Index
@@ -113,26 +97,24 @@
 (define (checkName N L)
   (if (null? (cdr L))
       (equal? N (getName (car L)))
-      (or ((equal? N (getName (car L)))(checkName N (cdr L))))))
+      (or (equal? N (getName (car L)))(checkName N (cdr L)))
+
 
 
 ;MergeFiles
 ;funcion que mezcla los archivos desde 2 listas (A|B), privilegiando los de A
-      ;nota, A es la lista nueva, B es la antigua
 (define (mergeFiles A B)
-  (if (not(null? A))
-      (if (not (null? B))
-          (if (and(listArch? A)(listArch? B))
-              (if (checkName (getName (car B)) A)
-                  (mergeFiles A (cdr B))
-                  (mergeFiles (append A (cons (car B) '())) (cdr B)))
-              '())
-          A)
-      (if (not (null? B))
-          (if (listArch? B)
-              B
-              '())
-          '())))
+  (if (and(listArch? A)(listArch? B))
+      (unifyFiles A B)
+      '()))
+;UnifyFiles
+;Funcion recursiva que unifica los archivos en una lista
+(define (unifyFiles A B C)
+  (if (or (null? B)(null? A))
+      A
+      (if (checkName (car A) B)
+          (unifyFiles (cdr A) (cons B A)))
+
 
 ;----------------------------------------------------------------------
 ;TDA Repository
@@ -140,9 +122,4 @@
 ;constructor:
 ;Dominio: Lista_Commits/Commit
 ;Recorrido: Repositorio
-
-
-;--------------------------------------------------------------------------
-;Funciones necesarias:
-;add
 
