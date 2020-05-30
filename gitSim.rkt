@@ -1,7 +1,15 @@
 #lang racket
-
-
-
+;---- TDAs Requeridos --------+
+(require "TDA_ListArch.rkt")
+(require "TDA_FileName.rkt")
+(require "TDA_FileList.rkt")
+(require "TDA_Index.rkt")
+(require "TDA_Workspace.rkt")
+(require "TDA_Repo.rkt")
+(require "TDA_Archivo.rkt")
+(require "TDA_Commit.rkt")
+(require "TDA_Zonas.rkt")
+(require "Fns_Auxiliares.rkt")
 
 ;---------------------------Funciones Auxiliares-------------------------------
 ;Check Names
@@ -62,7 +70,7 @@
 (define git (lambda (f) f))
 ;add
 (define add (lambda (Lista)(lambda (zonas)
-                             (if (and (listArch? Lista))
-                                 (setIndex zonas (PrepareFiles Lista (getWorkspaceZ zonas) '()))
-                                     (
+                             (if (and (fileList? Lista))
+                                 (setIndex zonas (Index (PrepareFiles Lista (getWorkspaceZ zonas) '())))
+                                     
               ))))

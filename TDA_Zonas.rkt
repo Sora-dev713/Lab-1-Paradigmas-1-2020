@@ -44,3 +44,46 @@
   (if (zonas? Z)
       (cadddr Z)
       '()))
+
+
+;Modificadores:
+
+(define (setWorkspace Z W)
+  (if (and (zonas? Z)(workspace? W))
+      (Zonas W (getIndex Z)(getLocRepo Z)(getRemRepo Z))
+      (if (zonas? Z)
+          Z
+          '())
+      )
+  )
+
+(define (setIndex Z I)
+  (if (and (zonas? Z)(index? I))
+      (Zonas (getWorkspace Z) I(getLocRepo Z)(getRemRepo Z))
+      (if (zonas? Z)
+          Z
+          '())
+      )
+  )
+
+(define (setLocRepo Z L)
+  (if (and (zonas? Z)(repo? L)(equal? (getNameR L) "Local Repository"))
+      (Zonas (getWorkspace Z) (getIndex Z) L (getRemRepo Z))
+      (if (zonas? Z)
+          Z
+          '())
+      )
+  )
+
+(define (setRemRepo Z R)
+  (if (and (zonas? Z)(repo? R)(equal? (getNameR R) "Remote Repository"))
+      (Zonas (getWorkspace Z) (getIndex Z) (getLocRepo Z) R)
+      (if (zonas? Z)
+          Z
+          '())
+      )
+  )
+
+
+;-----------------------------------------------------------------
+(provide (all-defined-out))

@@ -1,14 +1,29 @@
 #lang racket
-;TDA Commit:
-;Representacion: [[Archivos], "Comentario"]
-;Constructor:
-(define (CrearCommit L comment)
-  (if(and(listArch? L)(string? comment))
+
+(require "TDA_FileList.rkt")
+
+;------------------------TDA Commit-------------------------------
+
+;Representacion: [FileList, "Comentario"]
+
+;-----------------------------------------------------------------
+;Constructor
+
+;Domino: FileList X String
+;Constructor: Commit
+(define (CrearCommit L Comment)
+  (if(and(fileList? L)(string? Comment))
      (list L comment)
      '()))
+;-----------------------------------------------------------------
+;Funcion de Pertenencia
 
-;pertenencia
+;Domino: Commit
+;Recorrido: Boolean
 (define (commit? C)
-  (if(and(list? C)(listArch? (car C))(string? (cadr C))(null? (cddr C)))
+  (if(and(list? C)(fileList? (car C))(string? (cadr C))(null? (cddr C)))
      #t
      #f))
+
+;-----------------------------------------------------------------
+(provide (all-defined-out))
