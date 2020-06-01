@@ -1,15 +1,23 @@
 #lang racket
+;---- TDAs Requeridos --------+
+(require "TDA_Workspace.rkt")
+(require "TDA_Index.rkt")
+(require "TDA_Repo.rkt")
+;-----------------------------+
+;-----------------------
 ;TDAZonas
 ;representacion: [Workspace, Index, Local Repository, Remote Repository]
-;Dominio: Workspace X Index X Repositorio X Repositorio
+;Dominio: Workspace X Index X Repositorio X Repositorio X Registro
 ;Recorrido: Zonas
-(define Zonas (lambda (W I L R)
+(define Zonas (lambda (W I L R Reg)
                 (if (and(workspace? W)
                         (index? I)
                         (repo? L)(equal? (getNameR L) "Local Repository")
-                        (repo? R)(equal? (getNameR R) "Remote Repository"))
-                    (list W I L R)
+                        (repo? R)(equal? (getNameR R) "Remote Repository")
+                        (list? Reg))
+                    (list W I L R Reg)
                     '())))
+
 ;Funcion de Pertenencia:
 ;Dominio: Zonas
 ;Recorrido: Boolean
@@ -18,7 +26,8 @@
                      (index? (cadr Z))
                      (equal? (getNameR (caddr Z)) "Local Repository")
                      (equal? (getNameR (cadddr Z)) "Remote Repository")
-                     (null? (cadddr (cdr Z))))))
+                     (list? (cadddr (cdr Z)))
+                     (null? (cadddr (cddr Z))))))
 
 ;Funciones Selectoras
 ;getWorkspace
@@ -43,6 +52,12 @@
 (define (getRemRepo Z)
   (if (zonas? Z)
       (cadddr Z)
+      '()))
+
+;getRemRepo
+(define (getReg Z)
+  (if (zonas? Z)
+      (cadddr (cdr Z))
       '()))
 
 

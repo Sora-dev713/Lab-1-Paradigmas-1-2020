@@ -1,15 +1,20 @@
 #lang racket
+;---- TDAs Requeridos --------+
+(require "TDA_FileName.rkt")
+(require "TDA_FileList.rkt")
+(require "TDA_CommitList.rkt")
+;-----------------------------+
+
 ;TDA Repository
-;Representacion: ["NombreReposiorio", Lista_Commits,Lista_Archivos]
+;Representacion: ["NombreReposiorio", Lista_Commits]
 ;constructor:
-;Dominio:StringXLista_Commits/Commit
+;Dominio:StringXLista_Commits
 ;Recorrido: Repositorio
-(define (Repository S LA C )
+(define (Repository S C)
   (if (and(string? S)
           (or(equal? S "Local Repository")(equal? S "Remote Repository"))
-          (or(listArch? LA)(null? LA))
-          (or(commit? C)(null? C)))
-      (list S LA (cons C '()))
+          (commitList? C))
+      (list S C)
       '()))
 
 ;Funcion de pertenencia:
@@ -18,9 +23,8 @@
 (define (repo? R)
   (and (string? (car R))
        (or(equal? (car R) "Local Repository")(equal? (car R) "Remote Repository"))
-       (or(listArch? (cadr R))(null? (cadr R)))
-       (or(commit? (caddr R))(null? (caddr R)))
-       (null? (cadddr R))))
+       (commitList? (cadr R))
+       (null? (caddr R))))
 
 ;Funciones Selectoras:
 ;GetNameR
@@ -30,7 +34,7 @@
       '()))
 
 ;getCommits
-(define (getCommit R)
+(define (getCommitL R)
   (if (repo? R)
       (cadr R)
       '()))
