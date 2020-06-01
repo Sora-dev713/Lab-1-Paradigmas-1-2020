@@ -57,9 +57,10 @@
       (if (null? L)
           L2
           (if (and (workspace? W) (fileList? L2))
-              (if (checkName (car L)(getListaArcW W))
+              (if (checkName (car L)(getWFileList W))
                   (PrepareFiles (cdr L) W (cons (car L) L2))
                   (PrepareFiles (cdr L) W L2))
-              '())))
+              '()))
+      '()))
 ;-----------------------------------------------------------------
 (provide (all-defined-out))

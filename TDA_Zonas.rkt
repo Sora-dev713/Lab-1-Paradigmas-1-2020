@@ -9,11 +9,11 @@
 ;representacion: [Workspace, Index, Local Repository, Remote Repository]
 ;Dominio: Workspace X Index X Repositorio X Repositorio X Registro
 ;Recorrido: Zonas
-(define Zonas (lambda (W I L R Reg)
+(define makeZonas (lambda (W I L R Reg)
                 (if (and(workspace? W)
                         (index? I)
-                        (repo? L)(equal? (getNameR L) "Local Repository")
-                        (repo? R)(equal? (getNameR R) "Remote Repository")
+                        (repository? L)(equal? (getNameR L) "Local Repository")
+                        (repository? R)(equal? (getNameR R) "Remote Repository")
                         (list? Reg))
                     (list W I L R Reg)
                     '())))
@@ -27,7 +27,7 @@
                      (equal? (getNameR (caddr Z)) "Local Repository")
                      (equal? (getNameR (cadddr Z)) "Remote Repository")
                      (list? (cadddr (cdr Z)))
-                     (null? (cadddr (cddr Z))))))
+                     (null? (cdddr (cddr Z))))))
 
 ;Funciones Selectoras
 ;getWorkspace
@@ -65,7 +65,7 @@
 
 (define (setWorkspace Z W)
   (if (and (zonas? Z)(workspace? W))
-      (Zonas W (getIndex Z)(getLocRepo Z)(getRemRepo Z))
+      (makeZonas W (getIndex Z)(getLocRepo Z)(getRemRepo Z) (getReg Z))
       (if (zonas? Z)
           Z
           '())
@@ -74,7 +74,7 @@
 
 (define (setIndex Z I)
   (if (and (zonas? Z)(index? I))
-      (Zonas (getWorkspace Z) I(getLocRepo Z)(getRemRepo Z))
+      (makeZonas (getWorkspace Z) I(getLocRepo Z)(getRemRepo Z)(getReg Z))
       (if (zonas? Z)
           Z
           '())
@@ -82,8 +82,8 @@
   )
 
 (define (setLocRepo Z L)
-  (if (and (zonas? Z)(repo? L)(equal? (getNameR L) "Local Repository"))
-      (Zonas (getWorkspace Z) (getIndex Z) L (getRemRepo Z))
+  (if (and (zonas? Z)(repository? L)(equal? (getNameR L) "Local Repository"))
+      (makeZonas (getWorkspace Z) (getIndex Z) L (getRemRepo Z)(getReg Z))
       (if (zonas? Z)
           Z
           '())
@@ -91,14 +91,24 @@
   )
 
 (define (setRemRepo Z R)
-  (if (and (zonas? Z)(repo? R)(equal? (getNameR R) "Remote Repository"))
-      (Zonas (getWorkspace Z) (getIndex Z) (getLocRepo Z) R)
+  (if (and (zonas? Z)(repository? R)(equal? (getNameR R) "Remote Repository"))
+      (makeZonas (getWorkspace Z) (getIndex Z) (getLocRepo Z) R(getReg Z))
       (if (zonas? Z)
           Z
           '())
       )
   )
+;-----------------------------------------------------------------
+(define (clearIndex Z)
+  (if (zonas? Z)
+      (setIndex Z (setFList (getIndex Z) '()))
+      '()))
 
-
+(define makeTestZonas (list
+                       (list "Workspace" (list "a.rkt" "b.txt" "c.d"))
+                       (list "Index" '())
+                       (list "Local Repository" '())
+                       (list "Remote Repository" '())
+                       '()))
 ;-----------------------------------------------------------------
 (provide (all-defined-out))

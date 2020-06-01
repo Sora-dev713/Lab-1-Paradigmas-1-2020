@@ -11,7 +11,7 @@
 
 ;Domino: FileList X String
 ;Constructor: Commit
-(define (CrearCommit L Comment)
+(define (crearCommit L Comment)
   (if(and(fileList? L)(string? Comment))
      (list L Comment)
      '()))
