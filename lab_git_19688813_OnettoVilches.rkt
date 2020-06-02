@@ -13,6 +13,8 @@
 ;-------------------------- Codigo Principal ------------------------------
 ;Nombre Autor: Bastian Onetto
 ;Seccion: A-1
+
+;Zonas para Prueba: (define Z (makeZonas (createWorkspace (list "a.rkt" "b.txt" "c.d"))(Index '())(repository "Local Repository" '())(repository "Remote Repository" '()) '()))
 ;--------------------------------------------------------------------------
 ;-----------------Requerimientos Funcionales Obligatorios------------------
 ;--------------------------------------------------------------------------
@@ -75,6 +77,10 @@
                                      zonas)
                                  '()))))
 
+;Ejemplos de uso:
+;((git pull) (makeZonas (createWorkspace (list "a.rkt" "b.txt" "c.d"))(Index '())(repository "Local Repository" '())(repository "Remote Repository" (list (list "h.txt") "prueba 1")) '())))
+;((git pull) (makeZonas (createWorkspace (list "a.rkt" "b.txt" "c.d"))(Index '())(repository "Local Repository" '())(repository "Remote Repository" (list (list (list "a.rkt") "prueba 2") (list (list "h.txt") "prueba 1"))) '())))
+;((git pull) (makeZonas (createWorkspace (list "a.rkt" "b.txt" "c.d"))(Index '())(repository "Local Repository" '())(repository "Remote Repository" (list (list (list "a.rkt" "b.txt") "prueba 2") (list (list "h.txt" "k.h") "prueba 1"))) '())))
 ;--------------------------------------------------------------------------
 ;----------------------------------Pull------------------------------------
 
@@ -90,6 +96,12 @@
                    (setWorkspace zonas (addFilesToW (getWorkspace zonas) (fileFilter (unifyCFiles (getCommitL (getRemRepo zonas)) '())
                                                            (getWFileList (getWorkspace zonas)))))
                    '())))
+
+;Ejemplos de uso:
+;((git add) (list "a.rkt" "b.txt") Z)
+;((git add) (list "a.rkt") Z)
+;((git add) (list "a.rkt" "c.d") Z)
+;
 ;--------------------------------------------------------------------------
 ;---------------------------------Commit-----------------------------------
 
@@ -108,7 +120,10 @@
                            zonas)
                        '())
                    )))
-
+;Ejemplos de uso:
+;((git commit) "prueba1" ((git add) (list "a.rkt" "b.txt") Z))
+;((git commit) "prueba4"((git add) (list "a.rkt") Z))
+;((git commit) "prueba3"((git add) (list "a.rkt" "c.d") Z))
 
 ;--------------------------------------------------------------------------
 ;----------------------------------Push------------------------------------
@@ -123,6 +138,11 @@
               (if (zonas? zonas)
                    (setRemRepo zonas (copyToRem (getLocRepo zonas) (getRemRepo zonas)))
                     '())))
+
+;Ejemplos de uso:
+;((git Push)((git commit) "prueba1" ((git add) (list "a.rkt" "b.txt") Z)))
+;((git Push)((git commit) "prueba4"((git add) (list "a.rkt") Z)))
+;((git Push)((git commit) "prueba3"((git add) (list "a.rkt" "c.d") Z)))
 ;--------------------------------------------------------------------------
 ;-----------------------------Zonas->String--------------------------------
 
@@ -142,6 +162,11 @@
                                   (registerToString (getReg zonas))
                                   "\n")
                     '())))
+
+;Ejemplos de Uso (con display):
+;(display (zonas->string ((git commit) "prueba1" ((git add) (list "a.rkt" "b.txt") Z))))
+;(display (zonas->string ((git add) (list "a.rkt") Z)))
+;(display (zonas->string ((git Push)((git commit) "prueba3"((git add) (list "a.rkt" "c.d") Z)))))
 ;--------------------------------------------------------------------------
 ;--------------------------------------------------------------------------
 ;--------------------------------------------------------------------------
