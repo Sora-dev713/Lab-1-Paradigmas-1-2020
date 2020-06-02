@@ -1,6 +1,6 @@
 #lang racket
 
-;------------------------TDA FileName-------------------------------
+;---------------------- TDA FileName -----------------------------
 
 ;Representacion: String = "NombreArchivo"."Extension"
 
@@ -11,9 +11,9 @@
 ;Recorrido: FileName
 
 (define (fileName Nombre Extension)
-  (if (and (string? Nombre)(<= (string-length Nombre) 0)
+  (if (and (string? Nombre)(<= (string-length Nombre) 0);si se cumplen las condiciones de que ambos deben ser strings no vacios
             (string? Extension)(<= (string-length Extension) 0))
-      (string-join (list Nombre Extension) ".")
+      (string-join (list Nombre Extension) ".");se unen para crear un solo string
       '()))
 
 ;-----------------------------------------------------------------
