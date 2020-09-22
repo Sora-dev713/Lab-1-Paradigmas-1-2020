@@ -83,6 +83,16 @@
       (setComList R (getCommitL L))
       '()))
 ;-----------------------------------------------------------------
+;funcion getCommitNumbers
+;funcion que nos entrega cuantos commits hay en el repositorio
+;Dominio: Repository
+;Recorrido: Innteger
+(define(getCommitNumbers R)
+  (if (repository? R)
+      (countCommits (getCommitL R) 0)
+      0)
+  )
+;-----------------------------------------------------------------
 ;RepoToString
 ;Desc: Funcion encargada de representar el Repositorio como un string
 ;Dominio: Repository

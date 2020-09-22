@@ -149,6 +149,64 @@
       (setIndex Z (setFList (getIndex Z) '()))
       '()))
 
+;-----------------------------------------------------------------
+;funcion isIndexEmpty
+;Funcion que retorna un dato de tipo Boolean para saber si el Workspace
+;esta o no vacio
+(define (isWorkEmpty Z)
+  (if(zonas? Z)
+     (if (null? (getWFileList(getWorkspace Z)))
+         #t
+         #f)
+     #f))
+;-----------------------------------------------------------------
+;funcion isIndexEmpty
+;Funcion que retorna un dato de tipo Boolean para saber si el index
+;esta o no vacio
+;Dominio: Zonas
+;Recorrido: Boolean
+(define (isIndexEmpty Z)
+  (if(zonas? Z)
+     (if (null? (getListI(getIndex Z)))
+         #t
+         #f)
+     #f))
+;-----------------------------------------------------------------
+;funcion isLocalEmpty
+;Funcion que retorna un dato de tipo Boolean para saber si el Local
+;Repository esta o no vacio
+;Dominio: Zonas
+;Recorrido: Boolean
+(define (isLocalEmpty Z)
+  (if(zonas? Z)
+     (if (null? (getCommitL(getLocRepo Z)))
+         #t
+         #f)
+     #f))
+;-----------------------------------------------------------------
+;funcion isRemoteEmpty
+;Funcion que retorna un dato de tipo Boolean para saber si el Remote
+;Repository esta o no vacio
+;Dominio: Zonas
+;Recorrido: Boolean
+(define (isRemoteEmpty Z)
+  (if(zonas? Z)
+     (if (null? (getCommitL(getRemRepo Z)))
+         #t
+         #f)
+     #f))
+;-----------------------------------------------------------------
+;Funcion canPush
+;Funcion que verifica si es que se puede hacer o no el push
+;Dominio: Zonas
+;Recorrido: Boolean
+(define (canPush Z)
+  (if (not(isLocalEmpty Z))
+      (if (not(equal? (getCommitNumbers (getRemRepo Z)) (getCommitNumbers (getLocRepo Z))))
+          #t
+          #f)
+      #f))
+          
 ;-------------------- Funciones para registro --------------------
 ;addRegister
 ;funcion encargada de añadir un nuevo string al registro

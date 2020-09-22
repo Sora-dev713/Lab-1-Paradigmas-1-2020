@@ -42,7 +42,7 @@
 ;Dominio: Workspace
 ;Recorrido String
 
-(define (getWFiles W)
+(define (getWName W)
   (if (workspace? W)
       (car W)
       '()))

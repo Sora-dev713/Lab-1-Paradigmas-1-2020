@@ -35,30 +35,31 @@
                 (if (procedure? (comando args));Si es que la informacion hasta el momento corresponde a un procedure
                     (lambda (zonas); pedimos el ingreso de las Zonas
                       (if (and (string? args)(equal? comando commit)(zonas? zonas));Si los datos corresponden a un Commit
-                          ((comando args)(addRegister zonas "Commit"))
+                          (if (not(isIndexEmpty zonas))
+                              ((comando args)(addRegister zonas "Commit"))
+                              zonas)
                           (if(and (fileList? args)(equal? comando add)(zonas? zonas));Si los datos corresponden a un Add
-                             ((comando args)(addRegister zonas "Add"))
+                             (if (not(isWorkEmpty zonas))
+                                 ((comando args)(addRegister zonas "Add"))
+                                 zonas)
                              zonas);Si no corresponde a niuno, se entregan las zonas sin cambio.
                           )
                       )
                     ;En el caso de que no seaun procedure pero una funcion por si sola
                     (if (and (zonas? args)(equal? comando pull));Si los datos corresponden a un Pull
-                        (comando (addRegister args "Pull"))
+                        (if (isRemoteEmpty args)
+                            args
+                            (comando (addRegister args "Pull")))
                         (if (and (zonas? args)(equal? comando push));Si los datos corresponden a un Push
-                            (comando (addRegister args "Push"))
+                            (if (canPush args)
+                                (comando (addRegister args "Push"))
+                                args)
                             args))))));Si no, se entregan los argumento de vuelta, que por lo general, son zonas.
 
 ;Ejemplos de uso:
-;((git add)((list(list "Workspace" (list "a.rkt" "b.txt" "c.d"))
-;               (list "Index" '())
-;               (list "Local Repository" '())
-;               (list "Remote Repository" '())
-;               '())))
-;siguiendo el ejemplo anterior
-;(((git commit) "Commit de Prueba") ((git add)((list(list "Workspace" (list "a.rkt" "b.txt" "c.d"))(list "Index" '())(list "Local Repository" '())(list "Remote Repository" '())'()))))
-;
-;Siguiendo nuevamente el ejemplo anterior:
-;((git push) (((git commit) "Commit de Prueba") ((git add)((list(list "Workspace" (list "a.rkt" "b.txt" "c.d"))(list "Index" '())(list "Local Repository" '())(list "Remote Repository" '())'())))))
+;(((git add) (list "a.rkt" "b.txt" "c.d")) Z)
+;(((git commit) "Commit de prueba")(((git add) (list "a.rkt" "b.txt" "c.d")) Z))
+;((git pull)((git push)(((git commit) "prueba1")(((git add) (list "a.rkt" "b.txt"))Z))))
 ;--------------------------------------------------------------------------
 
 ;----------------------------------Add-------------------------------------
@@ -78,9 +79,56 @@
                                  '()))))
 
 ;Ejemplos de uso:
-;((git pull) (makeZonas (createWorkspace (list "a.rkt" "b.txt" "c.d"))(Index '())(repository "Local Repository" '())(repository "Remote Repository" (list (list "h.txt") "prueba 1")) '())))
-;((git pull) (makeZonas (createWorkspace (list "a.rkt" "b.txt" "c.d"))(Index '())(repository "Local Repository" '())(repository "Remote Repository" (list (list (list "a.rkt") "prueba 2") (list (list "h.txt") "prueba 1"))) '())))
-;((git pull) (makeZonas (createWorkspace (list "a.rkt" "b.txt" "c.d"))(Index '())(repository "Local Repository" '())(repository "Remote Repository" (list (list (list "a.rkt" "b.txt") "prueba 2") (list (list "h.txt" "k.h") "prueba 1"))) '())))
+;((git add) (list "a.rkt" "b.txt") Z)
+;((git add) (list "a.rkt") Z)
+;((git add) (list "a.rkt" "c.d") Z)
+;
+
+;--------------------------------------------------------------------------
+;---------------------------------Commit-----------------------------------
+
+;Descripcion: Funcion encargada de generar un Commit a partir de los archivos en Index y
+;             un comentario dejado por el usuario, el cual se ira guardando en el Local
+;             Repository.
+
+;Dominio: String X Zonas
+;Recorrido: Zonas
+
+(define commit (lambda (mensaje)
+                 (lambda (zonas)
+                   (if (zonas? zonas)
+                       (if (string? mensaje)
+                           (if (not(equal? mensaje ""))
+                               (if (not(isIndexEmpty zonas))
+                                   (clearIndex (setLocRepo zonas (addCommit (getLocRepo zonas) (crearCommit (getListI (getIndex zonas)) mensaje))))
+                                   zonas)
+                               zonas)
+                           zonas)
+                       '())
+                   )))
+;Ejemplos de uso:
+;(((git commit) "prueba1" )(((git add) (list "a.rkt" "b.txt")) Z))
+;(((git commit) "prueba4" )(((git add) (list "a.rkt")) Z))
+;(((git commit) "prueba3" )(((git add) (list "a.rkt" "c.d")) Z))
+
+;--------------------------------------------------------------------------
+;----------------------------------Push------------------------------------
+
+;Desc: Funcion encargada de pasar los commits guardado en el Local Repository
+;      hacia el Remote Repository.
+
+;Dominio: Zonas
+;Recorrido: Zonas
+
+(define push (lambda (zonas)
+              (if (zonas? zonas)
+                   (setRemRepo zonas (copyToRem (getLocRepo zonas) (getRemRepo zonas)))
+                    '())))
+
+;Ejemplos de uso:
+;((git push)(((git commit) "prueba1") (((git add) (list "a.rkt" "b.txt"))Z)))
+;((git push)(((git commit) "prueba4") (((git add) (list "a.rkt")) Z)))
+;((git push)(((git commit) "prueba3") (((git add) (list "a.rkt")) (((git commit) "prueba4") (((git add) (list "a.rkt")) Z)))))
 ;--------------------------------------------------------------------------
 ;----------------------------------Pull------------------------------------
 
@@ -98,51 +146,9 @@
                    '())))
 
 ;Ejemplos de uso:
-;((git add) (list "a.rkt" "b.txt") Z)
-;((git add) (list "a.rkt") Z)
-;((git add) (list "a.rkt" "c.d") Z)
-;
-;--------------------------------------------------------------------------
-;---------------------------------Commit-----------------------------------
-
-;Descripcion: Funcion encargada de generar un Commit a partir de los archivos en Index y
-;             un comentario dejado por el usuario, el cual se ira guardando en el Local
-;             Repository.
-
-;Dominio: String X Zonas
-;Recorrido: Zonas
-
-(define commit (lambda (mensaje)
-                 (lambda (zonas)
-                   (if (zonas? zonas)
-                       (if (string? mensaje)
-                           (clearIndex (setLocRepo zonas (addCommit (getLocRepo zonas) (crearCommit (getListI (getIndex zonas)) mensaje))))
-                           zonas)
-                       '())
-                   )))
-;Ejemplos de uso:
-;((git commit) "prueba1" ((git add) (list "a.rkt" "b.txt") Z))
-;((git commit) "prueba4"((git add) (list "a.rkt") Z))
-;((git commit) "prueba3"((git add) (list "a.rkt" "c.d") Z))
-
-;--------------------------------------------------------------------------
-;----------------------------------Push------------------------------------
-
-;Desc: Funcion encargada de pasar los commits guardado en el Local Repository
-;      hacia el Remote Repository.
-
-;Dominio: Zonas
-;Recorrido: Zonas
-
-(define push (lambda (zonas)
-              (if (zonas? zonas)
-                   (setRemRepo zonas (copyToRem (getLocRepo zonas) (getRemRepo zonas)))
-                    '())))
-
-;Ejemplos de uso:
-;((git Push)((git commit) "prueba1" ((git add) (list "a.rkt" "b.txt") Z)))
-;((git Push)((git commit) "prueba4"((git add) (list "a.rkt") Z)))
-;((git Push)((git commit) "prueba3"((git add) (list "a.rkt" "c.d") Z)))
+;((git pull) (makeZonas (createWorkspace (list "a.rkt" "b.txt" "c.d"))(Index '())(repository "Local Repository" '())(repository "Remote Repository" (list (list (cons "h.txt" '()) "prueba 1"))) '()))
+;((git pull) (makeZonas (createWorkspace '())(Index '())(repository "Local Repository" '())(repository "Remote Repository" (list (list (list "a.rkt") "prueba 2") (list (list "h.txt") "prueba 1"))) '()))
+;((git pull) (makeZonas (createWorkspace '())(Index '())(repository "Local Repository" '())(repository "Remote Repository" (list (list (list "a.rkt" "b.txt") "prueba 2") (list (list "h.txt" "k.h") "prueba 1"))) '()))
 ;--------------------------------------------------------------------------
 ;-----------------------------Zonas->String--------------------------------
 

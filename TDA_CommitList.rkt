@@ -57,6 +57,19 @@
       '()))
 
 ;-----------------------------------------------------------------
+;countCommits
+;Funcion que cuenta la cantidad de commits dada una lista
+;Dominio: CommitList
+;Recorrido: Integer
+;Recursion: Cola
+
+(define (countCommits Cl cont)
+  (if(and(commitList? Cl)(integer? cont))
+     (if(null? Cl)
+        cont
+        (countCommits (cdr Cl) (+ cont 1)))
+     0))
+;-----------------------------------------------------------------
 ;CommitListToString
 
 ;Descripcion: funcion que mediante llamados recursivos, pasa a String toda una
